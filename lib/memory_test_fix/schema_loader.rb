@@ -20,22 +20,28 @@ module MemoryTestFix
       configuration[:verbosity]
     end
 
-    def self.migrate
+    def self.migrate?
       configuration[:migrate] == true
     end
+
+    def self.load_seeds?
+      configuration[:load_seeds] == true
+    end
+
 
     def self.inform_using_in_memory
       puts "Creating sqlite :memory: database"
     end
 
     def self.load_schema
-      if migrate
+      if migrate?
         lambda {
           ActiveRecord::Migrator.up('db/migrate') # use migrations
         }
       else
         lambda {
           load "#{Rails.root}/db/schema.rb" # use db agnostic schema by default
+          load "#{Rails.root}/db/seeds.rb" if load_seeds?
         }
       end
     end
